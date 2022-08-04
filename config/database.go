@@ -2,30 +2,30 @@ package config
 
 import (
 	"fmt"
+
+	"crm-sebagian-team/utils"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
-	"os"
 )
 
-var DB *gorm.DB
-
-func connectDB() *gorm.DB {
-	DBUser := os.Getenv("DB_USER")
-	DBPassword := os.Getenv("DB_PASS")
-	DBName := os.Getenv("DB_NAME")
-	DBHost := os.Getenv("DB_HOST")
-	DBPort := os.Getenv("DB_PORT")
-
-	DBurl := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", DBUser, DBPassword, DBHost, DBPort, DBName)
-	db, err := gorm.Open(mysql.Open(DBurl), &gorm.Config{})
-	if err != nil {
-		log.Fatal("DB Connection Error")
+func NewDBConn() *utils.Conn {
+	return &utils.Conn{
+		GORM: initGorm(),
 	}
-	return db
 }
 
-func InitDB() *gorm.DB {
-	DB = connectDB()
-	return DB
+func initGorm() *gorm.DB {
+	username := "root"
+	password := ""
+	dbHost := "127.0.0.1"
+	dbPort := 3306
+	dbName := "bootcamp-majoo"
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", username, password, dbHost, dbPort, dbName)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	return db
 }
