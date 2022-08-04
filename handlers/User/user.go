@@ -21,7 +21,7 @@ func GetUsers(ctx echo.Context) error {
 
 func DeleteUser(ctx echo.Context) error {
 	id := ctx.Param("id")
-	err := models.GetBookByIsbn(id)
+	err := models.GetUserById(id)
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, Result{Message: err.Error(), Data: nil})
 	}
