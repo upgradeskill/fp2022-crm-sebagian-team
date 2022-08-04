@@ -19,6 +19,15 @@ func GetUsers(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, Result{Message: "Success Get Data", Data: users})
 }
 
+func GetUserById(ctx echo.Context) error {
+	id := ctx.Param("id")
+	err := models.GetUserById(id)
+	if err != nil {
+		return ctx.JSON(http.StatusNotFound, Result{Message: err.Error(), Data: nil})
+	}
+	return ctx.JSON(http.StatusOK, Result{Message: "Success Get Data", Data: models.Users})
+}
+
 func DeleteUser(ctx echo.Context) error {
 	id := ctx.Param("id")
 	err := models.GetUserById(id)
