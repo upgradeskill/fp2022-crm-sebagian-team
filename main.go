@@ -5,15 +5,18 @@ import (
 
 	"crm-sebagian-team/config"
 	"crm-sebagian-team/server"
+
+	"github.com/spf13/viper"
 )
 
 func main() {
+	cfg := config.NewConfig()
 	conn := config.NewDBConn()
 
-	timeoutContext := time.Duration(10) * time.Second
+	timeoutContext := time.Duration(viper.GetInt("APP_TIMEOUT")) * time.Second
 
 	// init repo category repo
 	repository := server.NewRepository(conn)
-	service := server.NewService(conn, repository, timeoutContext)
-	server.NewHandler(service)
+	service := server.NewService(cfg, conn, repository, timeoutContext)
+	server.NewHandler(cfg, service)
 }

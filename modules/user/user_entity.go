@@ -8,7 +8,7 @@ func (User) TableName() string {
 
 type User struct {
 	gorm.Model
-	Code        string `gorm:"column:code"`
-	Name        string `gorm:"column:name"`
-	Description string `gorm:"column:description"`
+	Name     string `gorm:"column:name"`
+	Email    string `gorm:"column:email"`
+	Password string `gorm:"column:password"`
 }

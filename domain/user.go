@@ -5,29 +5,31 @@ import (
 )
 
 type User struct {
-	ID          int64  `json:"id"`
-	Code        string `json:"code"`
-	Name        string `json:"name"`
-	Description string `json:"email"`
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type UserRequest struct {
-	Code        string `json:"code" validate:"required"`
-	Name        string `json:"name" validate:"required"`
-	Description string `json:"description" validate:"required"`
+	Name     string `json:"name" validate:"required"`
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 type UserResponse struct {
-	ID          int64  `json:"id"`
-	Code        string `json:"code"`
-	Name        string `json:"name"`
-	Description string `json:"email"`
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }
 
 type UserService interface {
 	Get(ctx context.Context, params *Request) ([]User, int64, error)
+	Store(ctx context.Context, usr *User) (User, error)
 }
 
 type UserRepository interface {
-	Get(ctx context.Context, params *Request) (new []User, total int64, err error)
+	Get(ctx context.Context, params *Request) ([]User, int64, error)
+	GetByEmail(ctx context.Context, email string) (User, error)
+	Store(ctx context.Context, usr *User) (User, error)
 }

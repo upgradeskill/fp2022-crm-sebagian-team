@@ -4,7 +4,10 @@ import (
 	"log"
 	"net/http"
 
-	_bookHandler "crm-sebagian-team/modules/user/handler"
+	"crm-sebagian-team/config"
+	"crm-sebagian-team/middleware"
+	_authHandler "crm-sebagian-team/modules/auth/handler"
+	_userHandler "crm-sebagian-team/modules/user/handler"
 
 	"github.com/labstack/echo/v4"
 )
@@ -18,15 +21,19 @@ func newAppHandler(e *echo.Echo) {
 }
 
 // NewHandler will create a new handler for the given usecase
-func NewHandler(svc *Service) {
+func NewHandler(cfg *config.Config, svc *Service) {
 
 	e := echo.New()
 	e.HTTPErrorHandler = ErrorHandler
+	middleware := middleware.InitMiddleware(cfg)
 
+	v1 := e.Group("/v1")
 	route := e.Group("")
+	route.Use(middleware.JWT)
 
 	newAppHandler(e)
-	_bookHandler.NewUserHandler(route, svc.UserService)
+	_authHandler.NewAuthHandler(v1, route, svc.AuthService)
+	_userHandler.NewUserHandler(v1, route, svc.UserService)
 
 	log.Fatal(e.Start(":3000"))
 }
