@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 
+	"crm-sebagian-team/modules/product"
 	"crm-sebagian-team/utils"
 
 	"gorm.io/driver/mysql"
@@ -23,9 +24,14 @@ func initGorm() *gorm.DB {
 	dbName := "bootcamp-majoo"
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", username, password, dbHost, dbPort, dbName)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	instanceDB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
-	return db
+	doMigration(instanceDB)
+	return instanceDB
+}
+
+func doMigration(instanceDB *gorm.DB) {
+	instanceDB.AutoMigrate(&product.Category{})
 }
