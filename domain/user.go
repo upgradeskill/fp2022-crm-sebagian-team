@@ -11,7 +11,7 @@ type User struct {
 	Email      string    `json:"email"`
 	Password   string    `json:"password"`
 	Address    string    `json:"address"`
-	IdPosition uint8     `json:"id_position"`
+	IdPosition int64     `json:"id_position"`
 	CreatedAt  time.Time `json:"created_at"`
 	CreatedBy  string    `json:"created_by"`
 	UpdatedAt  time.Time `json:"updated_at"`
@@ -25,7 +25,7 @@ type UserRequest struct {
 	Email      string    `json:"email" validate:"required"`
 	Password   string    `json:"password" validate:"required"`
 	Address    string    `json:"address"validate:"required"`
-	IdPosition uint8     `json:"id_position" validate:"required"`
+	IdPosition int64     `json:"id_position" validate:"required"`
 	CreatedAt  time.Time `json:"created_at"`
 	CreatedBy  string    `json:"created_by"`
 	UpdatedAt  time.Time `json:"updated_at"`
@@ -37,7 +37,7 @@ type UserResponse struct {
 	Email      string    `json:"email"`
 	Password   string    `json:"password"`
 	Address    string    `json:"address"`
-	IdPosition uint8     `json:"id_position"`
+	IdPosition int64     `json:"id_position"`
 	CreatedAt  time.Time `json:"created_at"`
 	CreatedBy  string    `json:"created_by"`
 }

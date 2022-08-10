@@ -16,7 +16,7 @@ type User struct {
 	Email      string       `gorm:"column:email"`
 	Password   string       `gorm:"column:password"`
 	Address    string       `gorm:"column:address"`
-	IdPosition uint8        `gorm:"column:id_position"`
+	IdPosition int64        `gorm:"column:id_position"`
 	CreatedAt  time.Time    `gorm:"column:created_at"`
 	CreatedBy  string       `gorm:"column:created_by"`
 	UpdatedAt  time.Time    `gorm:"column:updated_at"`

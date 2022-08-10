@@ -1,15 +1,11 @@
 package service
 
 import (
-	"context"
-	"time"
-
 	"crm-sebagian-team/domain"
-
-	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 type productService struct {
-	productRepo			domain.ProductRepository
-	contextTimeout 		time.Duration
+	productRepo    domain.ProductRepository
+	contextTimeout time.Duration
 }

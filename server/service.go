@@ -19,6 +19,7 @@ type Service struct {
 	UserService     domain.UserService
 	AuthService     domain.AuthService
 	CategoryService domain.CategoryService
+	PositionService domain.PositionService
 }
 
 func NewService(cfg *config.Config, conn *utils.Conn, r *Repository, timeoutContext time.Duration) *Service {
@@ -28,5 +29,6 @@ func NewService(cfg *config.Config, conn *utils.Conn, r *Repository, timeoutCont
 		AuthService:     _authService.NewAuthService(cfg, r.UserRepo, timeoutContext),
 		UserService:     _userService.NewUserService(r.UserRepo, timeoutContext),
 		CategoryService: _categoryService.NewCategoryService(r.CategoryRepo, validate, timeoutContext),
+		PositionService: _userService.NewPositionService(r.PositionRepo, timeoutContext),
 	}
 }

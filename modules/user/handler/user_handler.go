@@ -13,12 +13,14 @@ import (
 )
 
 type UserHandler struct {
-	UserSvc domain.UserService
+	UserSvc     domain.UserService
+	PositionSvc domain.PositionService
 }
 
-func NewUserHandler(e *echo.Group, r *echo.Group, us domain.UserService) {
+func NewUserHandler(e *echo.Group, r *echo.Group, us domain.UserService, ps domain.PositionService) {
 	handler := &UserHandler{
-		UserSvc: us,
+		UserSvc:     us,
+		PositionSvc: ps,
 	}
 	r.GET("/users", handler.GetAll)
 	r.POST("/users/create", handler.Register)
@@ -76,6 +78,11 @@ func (h *UserHandler) Register(c echo.Context) error {
 	email, _ := h.UserSvc.GetByEmail(ctx, req.Email)
 	if req.Email == email.Email {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("%s Sudah terdaftar", req.Email))
+	}
+
+	_, errPosition := h.PositionSvc.GetByID(ctx, req.IdPosition)
+	if errPosition != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("ID %s %s", req.IdPosition, errPosition.Error()))
 	}
 
 	usr, err := h.UserSvc.Store(ctx, req)
