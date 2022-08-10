@@ -7,6 +7,7 @@ import (
 	"crm-sebagian-team/config"
 	"crm-sebagian-team/middleware"
 	_authHandler "crm-sebagian-team/modules/auth/handler"
+	_productHandler "crm-sebagian-team/modules/product/handler"
 	_userHandler "crm-sebagian-team/modules/user/handler"
 
 	"github.com/labstack/echo/v4"
@@ -34,6 +35,7 @@ func NewHandler(cfg *config.Config, svc *Service) {
 	newAppHandler(e)
 	_authHandler.NewAuthHandler(v1, route, svc.AuthService)
 	_userHandler.NewUserHandler(v1, route, svc.UserService)
+	_productHandler.NewCategoryHandler(v1, route, svc.CategoryService)
 
 	log.Fatal(e.Start(":3000"))
 }
