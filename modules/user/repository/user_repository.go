@@ -7,7 +7,6 @@ import (
 	"crm-sebagian-team/helpers"
 	"crm-sebagian-team/modules/user"
 
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -17,18 +16,6 @@ type userRepository struct {
 
 func NewUserRepository(Conn *gorm.DB) domain.UserRepository {
 	return &userRepository{Conn}
-}
-
-func encryptPassword(password string) (string, error) {
-	encryptedPassword, err := bcrypt.GenerateFromPassword(
-		[]byte(password),
-		bcrypt.DefaultCost,
-	)
-	if err != nil {
-		return "", err
-	}
-
-	return string(encryptedPassword), nil
 }
 
 func (m *userRepository) Get(ctx context.Context, params *domain.Request) (res []domain.User, total int64, err error) {
@@ -46,9 +33,14 @@ func (m *userRepository) Get(ctx context.Context, params *domain.Request) (res [
 
 	for _, data := range bk {
 		resUser = append(resUser, domain.User{
-			ID:    int64(data.ID),
-			Name:  data.Name,
-			Email: data.Email,
+			ID:         int64(data.ID),
+			Name:       data.Name,
+			Email:      data.Email,
+			Password:   data.Password,
+			Address:    data.Address,
+			IdPosition: data.IdPosition,
+			CreatedAt:  data.CreatedAt,
+			CreatedBy:  data.CreatedBy,
 		})
 	}
 
@@ -76,9 +68,14 @@ func (m *userRepository) GetByEmail(ctx context.Context, email string) (domain.U
 
 func (m *userRepository) Store(ctx context.Context, usr *domain.User) (domain.User, error) {
 	usrEntity := user.User{
-		Name:     usr.Name,
-		Email:    usr.Email,
-		Password: usr.Password,
+		Name:       usr.Name,
+		Email:      usr.Email,
+		Password:   usr.Password,
+		Address:    usr.Address,
+		IdPosition: usr.IdPosition,
+		CreatedAt:  usr.CreatedAt,
+		CreatedBy:  usr.CreatedBy,
+		UpdatedAt:  usr.UpdatedAt,
 	}
 
 	query := m.Conn.Create(&usrEntity)

@@ -1,13 +1,12 @@
 package server
 
 import (
-	"log"
-	"net/http"
-
 	"crm-sebagian-team/config"
 	"crm-sebagian-team/middleware"
 	_authHandler "crm-sebagian-team/modules/auth/handler"
 	_userHandler "crm-sebagian-team/modules/user/handler"
+	"log"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )

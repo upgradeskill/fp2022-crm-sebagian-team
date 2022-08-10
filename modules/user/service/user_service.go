@@ -33,6 +33,17 @@ func encryptPassword(password string) (string, error) {
 	return string(encryptedPassword), nil
 }
 
+func beforeCreate(u *domain.UserRequest) (err error) {
+	hashedPassword, errHash := encryptPassword(u.Password)
+	if errHash != nil {
+		return
+	}
+	u.Password = string(hashedPassword)
+	u.CreatedAt = time.Now()
+	u.UpdatedAt = time.Now()
+	return
+}
+
 func (svc *userService) Get(c context.Context, params *domain.Request) ([]domain.User, int64, error) {
 
 	ctx, cancel := context.WithTimeout(c, svc.contextTimeout)
@@ -46,18 +57,38 @@ func (svc *userService) Get(c context.Context, params *domain.Request) ([]domain
 	return res, total, nil
 }
 
-func (svc *userService) Store(c context.Context, usr *domain.User) (domain.User, error) {
+func (svc *userService) GetByEmail(c context.Context, email string) (domain.User, error) {
 	ctx, cancel := context.WithTimeout(c, svc.contextTimeout)
 	defer cancel()
 
-	encryptedPassword, err := encryptPassword(usr.Password)
+	res, err := svc.userRepo.GetByEmail(ctx, email)
 	if err != nil {
 		return domain.User{}, err
 	}
 
-	usr.Password = string(encryptedPassword)
+	return res, nil
+}
 
-	usrRes, err := svc.userRepo.Store(ctx, usr)
+func (svc *userService) Store(c context.Context, request *domain.UserRequest) (domain.User, error) {
+	ctx, cancel := context.WithTimeout(c, svc.contextTimeout)
+	defer cancel()
+
+	err := beforeCreate(request)
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	usr := domain.User{
+		Name:       request.Name,
+		Email:      request.Email,
+		Password:   request.Password,
+		Address:    request.Address,
+		IdPosition: request.IdPosition,
+		CreatedAt:  request.CreatedAt,
+		CreatedBy:  request.CreatedBy,
+		UpdatedAt:  request.UpdatedAt,
+	}
+	usrRes, err := svc.userRepo.Store(ctx, &usr)
 
 	return usrRes, nil
 }

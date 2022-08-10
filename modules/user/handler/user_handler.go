@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"crm-sebagian-team/domain"
@@ -20,10 +21,11 @@ func NewUserHandler(e *echo.Group, r *echo.Group, us domain.UserService) {
 		UserSvc: us,
 	}
 	r.GET("/users", handler.GetAll)
+	r.POST("/users/create", handler.Register)
 	e.POST("/users/register", handler.Register)
 }
 
-func isRequestValid(u *domain.User) (bool, error) {
+func isRequestValid(u *domain.UserRequest) (bool, error) {
 	validate := validator.New()
 	err := validate.Struct(u)
 	if err != nil {
@@ -45,7 +47,7 @@ func (h *UserHandler) GetAll(c echo.Context) error {
 	listUser, total, err := h.UserSvc.Get(cx, &params)
 
 	if err != nil {
-		return err
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	res := helpers.Paginate(c, user.NewListUserResponse(listUser), total, params)
@@ -54,25 +56,42 @@ func (h *UserHandler) GetAll(c echo.Context) error {
 }
 
 func (h *UserHandler) Register(c echo.Context) error {
-	req := new(domain.User)
-	if err := c.Bind(req); err != nil {
+	req := new(domain.UserRequest)
+	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	fmt.Println(helpers.GetAuthenticatedUser(c).Email)
+	if helpers.GetAuthenticatedUser(c).Email == "" {
+		req.CreatedBy = req.Email
+	} else {
+		req.CreatedBy = helpers.GetAuthenticatedUser(c).Email
 	}
 
 	if ok, err := isRequestValid(req); !ok {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-
 	ctx := c.Request().Context()
+
+	email, _ := h.UserSvc.GetByEmail(ctx, req.Email)
+	if req.Email == email.Email {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("%s Sudah terdaftar", req.Email))
+	}
+
 	usr, err := h.UserSvc.Store(ctx, req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	resCreate := domain.UserResponse{
-		ID:    usr.ID,
-		Name:  usr.Name,
-		Email: usr.Email,
+		ID:         usr.ID,
+		Name:       usr.Name,
+		Email:      usr.Email,
+		Password:   usr.Password,
+		Address:    usr.Address,
+		CreatedAt:  usr.CreatedAt,
+		IdPosition: usr.IdPosition,
+		CreatedBy:  usr.CreatedBy,
 	}
 
 	res := map[string]interface{}{
