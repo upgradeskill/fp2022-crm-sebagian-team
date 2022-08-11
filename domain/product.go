@@ -42,5 +42,6 @@ type ProductService interface {
 type ProductRepository interface {
 	Get(ctx context.Context, params *Request) ([]Product, int64, error)
 	GetByName(ctx context.Context, name string) (Product, error)
+	Delete(ctx context.Context, ID int64) (Product, error)
 	// Store(ctx context.Context, prd *Product) (Product, error)
 }
