@@ -5,7 +5,6 @@ import (
 	"crm-sebagian-team/domain"
 	"crm-sebagian-team/helpers"
 	"crm-sebagian-team/modules/product"
-	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -71,6 +70,7 @@ func (m *productRepository) Delete(ctx context.Context, ID int64) (domain.Produc
 
 	return domain.Product{}, nil
 }
+
 // func (m *productRepository) Store(ctx context.Context, prd *domain.Product) (domain.Product, error) {
 // 	prdEntity := product.Product{
 // 		Name:      prd.Name,

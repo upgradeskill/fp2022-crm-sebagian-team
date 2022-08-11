@@ -12,13 +12,13 @@ func (Position) TableName() string {
 
 type Position struct {
 	gorm.Model
-	ID          int64        `gorm:"primary_key"`
-	Name        string       `gorm:"column:name"`
-	Description string       `gorm:"column:description"`
-	CreatedAt   time.Time    `gorm:"column:created_at"`
-	CreatedBy   string       `gorm:"column:created_by"`
-	UpdatedAt   time.Time    `gorm:"column:updated_at"`
-	UpdatedBy   string       `gorm:"column:updated_by"`
+	ID          int64        `gorm:"primary_key;autoIncrement;"`
+	Name        string       `gorm:"column:name;type:varchar(15);not null;"`
+	Description string       `gorm:"column:description;type:text;not null;"`
+	CreatedAt   time.Time    `gorm:"column:created_at;not null;"`
+	CreatedBy   string       `gorm:"column:created_by;type:varchar(50);not null;"`
+	UpdatedAt   time.Time    `gorm:"column:updated_at;not null;"`
+	UpdatedBy   string       `gorm:"column:updated_by;type:varchar(50);"`
 	DeletedAt   sql.NullTime `gorm:"column:deleted_at"`
-	DeletedBy   string       `gorm:"column:deleted_by"`
+	DeletedBy   string       `gorm:"column:deleted_by;type:varchar(50);"`
 }
