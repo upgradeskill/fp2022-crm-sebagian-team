@@ -14,8 +14,10 @@ func NewListProductResponse(datas []domain.Product) []domain.ProductResponse {
 
 func NewProductResponse(product domain.Product) domain.ProductResponse {
 	return domain.ProductResponse{
-		ID:   product.ID,
-		Name: product.Name,
-		Qty:  product.Qty,
+		ID:        product.ID,
+		Name:      product.Name,
+		Qty:       product.Qty,
+		CreatedAt: product.CreatedAt,
+		CreatedBy: product.CreatedBy,
 	}
 }
