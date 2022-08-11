@@ -20,7 +20,9 @@ func NewUserResponse(user domain.User) domain.UserResponse {
 		Password:   user.Password,
 		Address:    user.Address,
 		IdPosition: user.IdPosition,
-		CreatedAt:  user.CreatedAt,
+		CreatedAt:  &user.CreatedAt,
 		CreatedBy:  user.CreatedBy,
+		UpdatedAt:  user.UpdatedAt,
+		UpdatedBy:  user.UpdatedBy,
 	}
 }

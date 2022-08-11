@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-
 	"crm-sebagian-team/domain"
 	"crm-sebagian-team/helpers"
 	"crm-sebagian-team/modules/user"
@@ -41,6 +40,8 @@ func (m *userRepository) Get(ctx context.Context, params *domain.Request) (res [
 			IdPosition: data.IdPosition,
 			CreatedAt:  data.CreatedAt,
 			CreatedBy:  data.CreatedBy,
+			UpdatedAt:  data.UpdatedAt,
+			UpdatedBy:  data.UpdatedBy,
 		})
 	}
 
@@ -87,4 +88,41 @@ func (m *userRepository) Store(ctx context.Context, usr *domain.User) (domain.Us
 	usr.ID = int64(usrEntity.ID)
 
 	return *usr, nil
+}
+
+func (m *userRepository) UpdateUser(ctx context.Context, usr *domain.User) (domain.User, error) {
+	usrEntity := user.User{
+		ID:         int64(usr.ID),
+		Name:       usr.Name,
+		Email:      usr.Email,
+		Password:   usr.Password,
+		Address:    usr.Address,
+		IdPosition: usr.IdPosition,
+		UpdatedAt:  usr.UpdatedAt,
+		UpdatedBy:  usr.UpdatedBy,
+	}
+	if err := m.Conn.Where("id = ?", usr.ID).Updates(&usrEntity).Error; err != nil {
+		return domain.User{}, err
+	}
+
+	return *usr, nil
+}
+
+func (m *userRepository) GetByID(ctx context.Context, id int64) (domain.User, error) {
+	usr := user.User{}
+
+	query := m.Conn.Model(&usr).Where("id = ?", id).Take(&usr)
+
+	if query.Error != nil {
+		return domain.User{}, query.Error
+	}
+
+	resUser := domain.User{
+		ID:       int64(usr.ID),
+		Name:     usr.Name,
+		Email:    usr.Email,
+		Password: usr.Password,
+	}
+
+	return resUser, nil
 }

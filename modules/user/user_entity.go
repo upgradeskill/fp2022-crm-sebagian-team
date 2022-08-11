@@ -12,6 +12,7 @@ func (User) TableName() string {
 
 type User struct {
 	gorm.Model
+	ID         int64        `gorm:"primaryKey;autoIncrement"`
 	Name       string       `gorm:"column:name"`
 	Email      string       `gorm:"column:email"`
 	Password   string       `gorm:"column:password"`

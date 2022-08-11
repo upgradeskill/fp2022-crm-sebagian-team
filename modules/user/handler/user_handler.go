@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"crm-sebagian-team/domain"
 	"crm-sebagian-team/helpers"
@@ -24,10 +25,20 @@ func NewUserHandler(e *echo.Group, r *echo.Group, us domain.UserService, ps doma
 	}
 	r.GET("/users", handler.GetAll)
 	r.POST("/users/create", handler.Register)
+	r.PUT("/users/update/:id", handler.Update)
 	e.POST("/users/register", handler.Register)
 }
 
 func isRequestValid(u *domain.UserRequest) (bool, error) {
+	validate := validator.New()
+	err := validate.Struct(u)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func isRequestValidUpdate(u *domain.UserUpdate) (bool, error) {
 	validate := validator.New()
 	err := validate.Struct(u)
 	if err != nil {
@@ -82,7 +93,7 @@ func (h *UserHandler) Register(c echo.Context) error {
 
 	_, errPosition := h.PositionSvc.GetByID(ctx, req.IdPosition)
 	if errPosition != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("ID %s %s", req.IdPosition, errPosition.Error()))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("ID Position %d %s", req.IdPosition, errPosition.Error()))
 	}
 
 	usr, err := h.UserSvc.Store(ctx, req)
@@ -96,7 +107,7 @@ func (h *UserHandler) Register(c echo.Context) error {
 		Email:      usr.Email,
 		Password:   usr.Password,
 		Address:    usr.Address,
-		CreatedAt:  usr.CreatedAt,
+		CreatedAt:  &usr.CreatedAt,
 		IdPosition: usr.IdPosition,
 		CreatedBy:  usr.CreatedBy,
 	}
@@ -107,4 +118,50 @@ func (h *UserHandler) Register(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, res)
+}
+
+func (h *UserHandler) Update(c echo.Context) error {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	ctx := c.Request().Context()
+	_, errNotFound := h.UserSvc.GetByID(ctx, id)
+	if errNotFound != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("ID User %d %s", id, errNotFound.Error()))
+	}
+	req := domain.UserUpdate{}
+	if err := c.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+	}
+	if ok, err := isRequestValidUpdate(&req); !ok {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	req.ID = id
+	req.UpdatedBy = helpers.GetAuthenticatedUser(c).Email
+
+	_, errPosition := h.PositionSvc.GetByID(ctx, req.IdPosition)
+	if errPosition != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("ID Position %d %s", req.IdPosition, errPosition.Error()))
+	}
+
+	usr, err := h.UserSvc.UpdateUser(ctx, &req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	resUpdate := domain.UserResponse{
+		ID:         usr.ID,
+		Name:       usr.Name,
+		Email:      usr.Email,
+		Password:   usr.Password,
+		Address:    usr.Address,
+		IdPosition: usr.IdPosition,
+		UpdatedAt:  usr.UpdatedAt,
+		UpdatedBy:  usr.UpdatedBy,
+	}
+
+	res := map[string]interface{}{
+		"message": "update account success",
+		"data":    resUpdate,
+	}
+
+	return c.JSON(http.StatusOK, res)
 }
