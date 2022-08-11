@@ -1,6 +1,7 @@
 package config
 
 import (
+	"crm-sebagian-team/modules/user"
 	"fmt"
 
 	"crm-sebagian-team/modules/product"
@@ -33,5 +34,5 @@ func initGorm() *gorm.DB {
 }
 
 func doMigration(instanceDB *gorm.DB) {
-	instanceDB.AutoMigrate(&product.Category{})
+	instanceDB.AutoMigrate(&product.Category{}, &user.User{}, &user.Position{}, &product.Product{})
 }

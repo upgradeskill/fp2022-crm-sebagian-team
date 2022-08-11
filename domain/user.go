@@ -61,6 +61,7 @@ type UserService interface {
 	GetByEmail(ctx context.Context, email string) (User, error)
 	GetByID(ctx context.Context, id int64) (User, error)
 	UpdateUser(ctx context.Context, params *UserUpdate) (User, error)
+	DeleteUser(ctx context.Context, id int64, deletedBy string) error
 }
 
 type UserRepository interface {
@@ -69,4 +70,5 @@ type UserRepository interface {
 	Store(ctx context.Context, usr *User) (User, error)
 	GetByID(ctx context.Context, id int64) (User, error)
 	UpdateUser(ctx context.Context, params *User) (User, error)
+	DeleteUser(ctx context.Context, id int64, deletedBy string) error
 }

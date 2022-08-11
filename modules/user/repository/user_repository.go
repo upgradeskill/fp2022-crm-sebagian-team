@@ -5,6 +5,7 @@ import (
 	"crm-sebagian-team/domain"
 	"crm-sebagian-team/helpers"
 	"crm-sebagian-team/modules/user"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -125,4 +126,11 @@ func (m *userRepository) GetByID(ctx context.Context, id int64) (domain.User, er
 	}
 
 	return resUser, nil
+}
+
+func (m *userRepository) DeleteUser(ctx context.Context, id int64, deletedBy string) error {
+	if err := m.Conn.Model(&user.User{}).Where("id = ?", id).Updates(map[string]interface{}{"deleted_at": time.Now(), "deleted_by": deletedBy}).Error; err != nil {
+		return err
+	}
+	return nil
 }

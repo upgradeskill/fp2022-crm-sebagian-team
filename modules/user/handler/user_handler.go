@@ -26,6 +26,7 @@ func NewUserHandler(e *echo.Group, r *echo.Group, us domain.UserService, ps doma
 	r.GET("/users", handler.GetAll)
 	r.POST("/users/create", handler.Register)
 	r.PUT("/users/update/:id", handler.Update)
+	r.DELETE("/users/delete/:id", handler.Delete)
 	e.POST("/users/register", handler.Register)
 }
 
@@ -161,6 +162,27 @@ func (h *UserHandler) Update(c echo.Context) error {
 	res := map[string]interface{}{
 		"message": "update account success",
 		"data":    resUpdate,
+	}
+
+	return c.JSON(http.StatusOK, res)
+}
+
+func (h *UserHandler) Delete(c echo.Context) error {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	ctx := c.Request().Context()
+	usr, errNotFound := h.UserSvc.GetByID(ctx, id)
+	if errNotFound != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("ID User %d %s", id, errNotFound.Error()))
+	}
+	deletedBy := helpers.GetAuthenticatedUser(c).Email
+
+	err := h.UserSvc.DeleteUser(ctx, id, deletedBy)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	res := map[string]string{
+		"message": fmt.Sprintf("%s success deleted", usr.Email),
 	}
 
 	return c.JSON(http.StatusOK, res)
