@@ -138,3 +138,15 @@ func (svc *userService) UpdateUser(c context.Context, request *domain.UserUpdate
 
 	return usrRes, nil
 }
+
+func (svc *userService) DeleteUser(c context.Context, id int64, deletedBy string) error {
+	ctx, cancel := context.WithTimeout(c, svc.contextTimeout)
+	defer cancel()
+
+	err := svc.userRepo.DeleteUser(ctx, id, deletedBy)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
