@@ -34,7 +34,7 @@ func NewHandler(cfg *config.Config, svc *Service) {
 	newAppHandler(e)
 	_authHandler.NewAuthHandler(v1, route, svc.AuthService)
 	_userHandler.NewUserHandler(v1, route, svc.UserService, svc.PositionService)
-	_productHandler.NewCategoryHandler(v1, route, svc.CategoryService)
+	_productHandler.NewProductHandler(v1, route, svc.ProductService)
 
 	log.Fatal(e.Start(":3000"))
 }
